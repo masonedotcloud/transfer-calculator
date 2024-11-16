@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Upload/Download</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="icon" type="image/x-icon" href="https://icons.getbootstrap.com/assets/icons/ethernet.svg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container-fluid mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <h1 class="mb-4 text-center">Calcolo Upload</h1>
+
+                <div class="mb-3">
+                    <label for="fileSize" class="form-label">Dimensione del File:</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="fileSize" placeholder="Dimensione del file" step="any">
+                        <select id="fileSizeUnit" class="form-select">
+                            <option value="B">Bytes (B)</option>
+                            <option value="KB">Kilobytes (KB)</option>
+                            <option value="MB" selected>Megabytes (MB)</option>
+                            <option value="GB">Gigabytes (GB)</option>
+                            <option value="TB">Terabytes (TB)</option>
+                            <option value="PB">Petabytes (PB)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="speed" class="form-label">Velocità di Rete:</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="speed" placeholder="Velocità" step="any">
+                        <select id="speedUnit" class="form-select">
+                            <option value="Kbps">Kilobits per secondo (Kbps)</option>
+                            <option value="Mbps" selected>Megabits per secondo (Mbps)</option>
+                            <option value="Gbps">Gigabits per secondo (Gbps)</option>
+                            <option value="KBps">Kilobytes per secondo (KBps)</option>
+                            <option value="MBps">Megabytes per secondo (MBps)</option>
+                            <option value="GBps">Gigabytes per secondo (GBps)</option>
+                            <option value="TBps">Terabytes per secondo (TBps)</option>
+                            <option value="PBps">Petabytes per secondo (PBps)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100" onclick="calculate()">Calcola</button>
+
+                <div id="results" class="mt-4">
+                    <p id="uploadTime" class="lead">Tempo di Upload/Download: -</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function convertFileSizeToMB(size, unit) {
+            switch (unit) {
+                case 'B': return size / (1024 * 1024); // Bytes to MB
+                case 'KB': return size / 1024; // KB to MB
+                case 'MB': return size; // MB
+                case 'GB': return size * 1024; // GB to MB
+                case 'TB': return size * 1024 * 1024; // TB to MB
+                case 'PB': return size * 1024 * 1024 * 1024; // PB to MB
+                default: return size;
+            }
+        }
+
+        function convertSpeedToMBps(speed, unit) {
+            switch (unit) {
+                case 'Kbps': return speed / 8 / 1000; // Kbps to MBps
+                case 'Mbps': return speed / 8; // Mbps to MBps
+                case 'Gbps': return speed * 125; // Gbps to MBps
+                case 'KBps': return speed; // KBps to MBps
+                case 'MBps': return speed; // MBps
+                case 'GBps': return speed * 1024; // GBps to MBps
+                case 'TBps': return speed * 1024 * 1024; // TBps to MBps
+                case 'PBps': return speed * 1024 * 1024 * 1024; // PBps to MBps
+                default: return speed;
+            }
+        }
+
+        function formatTime(seconds) {
+            const days = Math.floor(seconds / 86400); // 86400 seconds in a day
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const remainingSeconds = (seconds % 60).toFixed(2);
+            return `${days}d ${hours}h ${minutes}m ${remainingSeconds}s`;
+        }
+
+        function calculate() {
+            const fileSize = parseFloat(document.getElementById('fileSize').value);
+            const fileSizeUnit = document.getElementById('fileSizeUnit').value;
+            const speed = parseFloat(document.getElementById('speed').value);
+            const speedUnit = document.getElementById('speedUnit').value;
+
+            if (isNaN(fileSize) || isNaN(speed) || fileSize <= 0 || speed <= 0) {
+                alert('Per favore, inserisci valori validi.');
+                return;
+            }
+
+            // Converti la dimensione del file in MB
+            const fileSizeMB = convertFileSizeToMB(fileSize, fileSizeUnit);
+
+            // Converti la velocità di rete in MB/s
+            const speedMBps = convertSpeedToMBps(speed, speedUnit);
+
+            // Calcolo del tempo di upload in secondi
+            const uploadTimeSeconds = fileSizeMB / speedMBps;
+
+            // Visualizzazione del risultato
+            document.getElementById('uploadTime').textContent = `Tempo di Upload/Download: ${formatTime(uploadTimeSeconds)}`;
+        }
+    </script>
+</body>
+</html>
